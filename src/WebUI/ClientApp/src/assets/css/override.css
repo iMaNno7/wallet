@@ -1,0 +1,8 @@
+.card{
+    border: 5px solid rgba(0, 0, 0, 0.125) !important;
+    border-style: dashed !important;
+}
+.list-group{
+    padding: 0 !important;
+    text-align: right;
+  }
