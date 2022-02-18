@@ -3,6 +3,7 @@ using System;
 using CleanArchitecture.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CleanArchitecture.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220216192052_change-wallet")]
+    partial class changewallet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,9 +121,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("IdentityUser")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("IdentityUser")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IscActive")
                         .HasColumnType("boolean");
@@ -130,10 +131,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");

@@ -9,26 +9,38 @@ namespace CleanArchitecture.Domain.Entities.WalletAggregate;
 public class Wallet : AuditableEntity<Guid>, IHasDomainEvent
 {
     private Wallet() { }
-   
+    public Wallet(string userId,string title)
+    {
+        IdentityUser = userId;
+        Title = title;
+    }
+
     public Balance Balance { get; private set; } = new();
     public List<DomainEvent> DomainEvents { get; set; } = new();
 
-    
-    public Guid UserId { get; set; }
+
+    public string Title { get; set; }
+    public string IdentityUser { get; set; }
+
+    public bool IscActive { get; set; }
 
     public List<Transaction> Transactions { get; private set; } = new();
 
+    public void ChangeStateWallet(bool status)
+    {
+        IscActive = status;
+    }
     //public void AddWithdrawalRequest(Amount amount)
     //{
     //    var transaction = RequestAggregate.Request.CreateWithdrawalRequest(amount, BankAccount);
     //    Requests.Add(transaction);
     //}
 
-    //public void Charge(Transaction transaction)
-    //{
-    //    Transactions.Add(transaction);
-    //    Balance.IncreaseWalletBalance(transaction.Amount);
-    //}
+    public void Charge(Transaction transaction)
+    {
+        Transactions.Add(transaction);
+        Balance.IncreaseWalletBalance(transaction.Amount);
+    }
     //public void Withdrawal(Transaction transaction)
     //{
     //    Transactions.Add(transaction);

@@ -16,12 +16,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AppRoutingModule } from './app-routing.module';
 import { TokenComponent } from './token/token.component';
+import { WalletComponent } from './Wallet/wallet.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
+    WalletComponent,
     CounterComponent,
     FetchDataComponent,
     TodoComponent,
