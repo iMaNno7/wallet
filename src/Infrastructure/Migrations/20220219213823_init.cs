@@ -29,7 +29,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    MyProperty = table.Column<int>(type: "integer", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -131,7 +130,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Balance_Value = table.Column<decimal>(type: "numeric", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    IdentityUser = table.Column<string>(type: "text", nullable: false),
+                    IscActive = table.Column<bool>(type: "boolean", nullable: false),
                     Created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
@@ -255,14 +256,14 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CategoryId = table.Column<int>(type: "integer", nullable: false),
+                    TransactionType = table.Column<int>(type: "integer", nullable: false),
                     Amount_Value = table.Column<decimal>(type: "numeric", nullable: false),
                     Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Note = table.Column<string>(type: "text", nullable: true),
-                    WalletId = table.Column<int>(type: "integer", nullable: false),
+                    WalletId = table.Column<Guid>(type: "uuid", nullable: false),
                     Priority = table.Column<int>(type: "integer", nullable: false),
                     Reminder = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     Done = table.Column<bool>(type: "boolean", nullable: false),
-                    WalletId1 = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
@@ -278,8 +279,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Transaction_Wallet_WalletId1",
-                        column: x => x.WalletId1,
+                        name: "FK_Transaction_Wallet_WalletId",
+                        column: x => x.WalletId,
                         principalTable: "Wallet",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -364,9 +365,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transaction_WalletId1",
+                name: "IX_Transaction_WalletId",
                 table: "Transaction",
-                column: "WalletId1");
+                column: "WalletId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -1,7 +1,7 @@
 import { Component, TemplateRef } from '@angular/core';
 import { faEllipsisH, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
-import { CreateTodoItemCommand, CreateTodoListCommand, CreateWalletCommand, GetAllWalletVm, IWalletClient, TodoItemDto, TodoItemsClient, TodoListDto, TodoListsClient, TodosVm, UpdateTodoItemCommand, UpdateTodoItemDetailCommand, UpdateTodoListCommand, UpdateWalletCommand, WalletClient } from '../web-api-client';
+import { CreateTodoListCommand, CreateWalletCommand, GetAllWalletVm, IWalletClient, TodoItemDto,  TodoListDto, TodoListsClient, TodosVm, TransactionClient,  UpdateTodoItemDetailCommand, UpdateTodoListCommand, UpdateWalletCommand, WalletClient } from '../web-api-client';
 
 @Component({
   selector: 'app-home',
@@ -29,7 +29,7 @@ export class WalletComponent {
   faPlus = faPlus;
   faEllipsisH = faEllipsisH;
 
-  constructor(private listsClient: TodoListsClient, private walletService: WalletClient, private itemsClient: TodoItemsClient, private modalService: BsModalService) {
+  constructor(private listsClient: TodoListsClient, private walletService: WalletClient, private itemsClient: TransactionClient, private modalService: BsModalService) {
     this.getWallets();
   }
 

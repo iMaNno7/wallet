@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CleanArchitecture.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220216192052_change-wallet")]
-    partial class changewallet
+    [Migration("20220219213823_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -94,17 +94,17 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("WalletId")
+                    b.Property<int>("TransactionType")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("WalletId1")
+                    b.Property<Guid>("WalletId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("WalletId1");
+                    b.HasIndex("WalletId");
 
                     b.ToTable("Transaction");
                 });
@@ -121,8 +121,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("IdentityUser")
-                        .HasColumnType("uuid");
+                    b.Property<string>("IdentityUser")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("IscActive")
                         .HasColumnType("boolean");
@@ -131,6 +132,10 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -512,7 +517,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasOne("CleanArchitecture.Domain.Entities.WalletAggregate.Wallet", "Wallet")
                         .WithMany("Transactions")
-                        .HasForeignKey("WalletId1")
+                        .HasForeignKey("WalletId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

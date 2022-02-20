@@ -23,12 +23,19 @@ public class WalletController : ApiControllerBase
         _currentUserService = currentUserService;
     }
 
+
+    [HttpGet("getDetail")]
+    public async Task<ActionResult<GetAllWalletVm>> Get()
+    {
+        return await Mediator.Send(new GetWalletQuery() { UserId = _currentUserService.UserId });
+    }
+
     [HttpGet]
     public async Task<ActionResult<List<GetAllWalletVm>>> GetList()
     {
         try
         {
-        return await Mediator.Send(new GetAllWalletQuery() { UserId= _currentUserService.UserId });
+            return await Mediator.Send(new GetAllWalletQuery() { UserId = _currentUserService.UserId });
 
         }
         catch (Exception ex)
@@ -37,6 +44,7 @@ public class WalletController : ApiControllerBase
             throw;
         }
     }
+    
 
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(CreateWalletCommand command)

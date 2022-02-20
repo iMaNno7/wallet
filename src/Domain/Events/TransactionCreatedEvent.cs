@@ -1,8 +1,8 @@
 ﻿namespace CleanArchitecture.Domain.Events;
 
-public class TodoItemCreatedEvent : DomainEvent
+public class TransactionCreatedEvent : DomainEvent
 {
-    public TodoItemCreatedEvent(Transaction item)
+    public TransactionCreatedEvent(Transaction item)
     {
         Item = item;
     }

@@ -9,6 +9,7 @@ namespace CleanArchitecture.Application.TodoLists.Queries.GetTodos;
 
 public class GetTodosQuery : IRequest<TodosVm>
 {
+    public string? UserId { get; set; }
 }
 
 public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
@@ -24,18 +25,23 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
 
     public async Task<TodosVm> Handle(GetTodosQuery request, CancellationToken cancellationToken)
     {
-        return new TodosVm
-        {
-            PriorityLevels = Enum.GetValues(typeof(PriorityLevel))
+        var vms = new TodosVm();
+
+        vms.PriorityLevels = Enum.GetValues(typeof(PriorityLevel))
                 .Cast<PriorityLevel>()
                 .Select(p => new PriorityLevelDto { Value = (int)p, Name = p.ToString() })
-                .ToList(),
+                .ToList();
+        var walletID =await _context.Wallet.AsQueryable().
+            Where(a => a.IscActive == true && a.IdentityUser == request.UserId)
+            .Select(a => a.Id).FirstOrDefaultAsync();
+        vms.Lists = await _context.Category
+            .AsNoTracking()
+            .Where(a => a.Items.Any(a => a.WalletId==walletID))
+            .ProjectTo<TodoListDto>(_mapper.ConfigurationProvider)
+            .OrderBy(t => t.Title)
+            .ToListAsync(cancellationToken);
 
-            Lists = await _context.Category
-                .AsNoTracking()
-                .ProjectTo<TodoListDto>(_mapper.ConfigurationProvider)
-                .OrderBy(t => t.Title)
-                .ToListAsync(cancellationToken)
-        };
+        return vms;
+
     }
 }

@@ -1,7 +1,13 @@
 import { Component, TemplateRef } from '@angular/core';
-import { TodoItemsClient, CreateTodoItemCommand, TodoItemDto, UpdateTodoItemCommand,
-         TodosVm, TodoListsClient, TodoListDto, CreateTodoListCommand, UpdateTodoListCommand,
-         UpdateTodoItemDetailCommand } from '../web-api-client';
+import {
+    TodoItemDto,
+    TodosVm, TodoListsClient, TodoListDto, CreateTodoListCommand, UpdateTodoListCommand,
+    UpdateTodoItemDetailCommand,
+    TransactionClient,
+    CreateTransactionCommand,
+    TransactionType,
+    UpdateTransactionCommand
+} from '../web-api-client';
 import { faPlus, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
@@ -15,6 +21,7 @@ export class TodoComponent {
     debug = false;
 
     vm: TodosVm;
+    transactionType: TransactionType;
 
     selectedList: TodoListDto;
     selectedItem: TodoItemDto;
@@ -31,7 +38,7 @@ export class TodoComponent {
     faPlus = faPlus;
     faEllipsisH = faEllipsisH;
 
-    constructor(private listsClient: TodoListsClient, private itemsClient: TodoItemsClient, private modalService: BsModalService) {
+    constructor(private listsClient: TodoListsClient, private itemsClient: TransactionClient, private modalService: BsModalService) {
         listsClient.get().subscribe(
             result => {
                 this.vm = result;
@@ -99,7 +106,7 @@ export class TodoComponent {
             .subscribe(
                 () => {
                     this.selectedList.title = this.listOptionsEditor.title,
-                    this.listOptionsModalRef.hide();
+                        this.listOptionsModalRef.hide();
                     this.listOptionsEditor = {};
                 },
                 error => console.error(error)
@@ -125,6 +132,7 @@ export class TodoComponent {
     // Items
 
     showItemDetailsModal(template: TemplateRef<any>, item: TodoItemDto): void {
+        debugger
         this.selectedItem = item;
         this.itemDetailsEditor = {
             ...this.selectedItem
@@ -134,23 +142,48 @@ export class TodoComponent {
     }
 
     updateItemDetails(): void {
-        this.itemsClient.updateItemDetails(this.selectedItem.id, UpdateTodoItemDetailCommand.fromJS(this.itemDetailsEditor))
-            .subscribe(
-                () => {
-                    if (this.selectedItem.listId != this.itemDetailsEditor.listId) {
-                        this.selectedList.items = this.selectedList.items.filter(i => i.id != this.selectedItem.id)
-                        let listIndex = this.vm.lists.findIndex(l => l.id == this.itemDetailsEditor.listId);
-                        this.selectedItem.listId = this.itemDetailsEditor.listId;
-                        this.vm.lists[listIndex].items.push(this.selectedItem);
-                    }
+        let newItem = this.selectedItem?.id == undefined;
+        if (newItem) {
+            this.itemsClient.create(CreateTransactionCommand.fromJS({ ...this.itemDetailsEditor, listId: this.selectedList.id }))
+                .subscribe(
+                    result => {
+                        debugger
+                        let item = TodoItemDto.fromJS({
+                            id: result,
+                            listId: this.selectedList.id,
+                            priority: this.vm.priorityLevels[0].value,
+                            title: this.itemDetailsEditor.title,
+                            done: false,
+                            note:this.itemDetailsEditor.note,
+                            amount:this.itemDetailsEditor.amount,
+                            transactionType:this.itemDetailsEditor.transactionType,                            
+                        });                
+                        this.selectedList.items.push(item);
+                        this.itemDetailsModalRef.hide();
+                        this.itemDetailsEditor = {};
+                    },
+                    error => console.error(error)
+                );
+        }
+        else {
+            this.itemsClient.update(this.selectedItem.id, UpdateTransactionCommand.fromJS(this.itemDetailsEditor))
+                .subscribe(
+                    () => {
+                        if (this.selectedItem.listId != this.itemDetailsEditor.listId) {
+                            this.selectedList.items = this.selectedList.items.filter(i => i.id != this.selectedItem.id)
+                            let listIndex = this.vm.lists.findIndex(l => l.id == this.itemDetailsEditor.listId);
+                            this.selectedItem.listId = this.itemDetailsEditor.listId;
+                            this.vm.lists[listIndex].items.push(this.selectedItem);
+                        }
 
-                    this.selectedItem.priority = this.itemDetailsEditor.priority;
-                    this.selectedItem.note = this.itemDetailsEditor.note;
-                    this.itemDetailsModalRef.hide();
-                    this.itemDetailsEditor = {};
-                },
-                error => console.error(error)
-            );
+                        this.selectedItem.priority = this.itemDetailsEditor.priority;
+                        this.selectedItem.note = this.itemDetailsEditor.note;
+                        this.itemDetailsModalRef.hide();
+                        this.itemDetailsEditor = {};
+                    },
+                    error => console.error(error)
+                );
+        }
     }
 
     addItem() {
@@ -181,7 +214,7 @@ export class TodoComponent {
         }
 
         if (item.id == 0) {
-            this.itemsClient.create(CreateTodoItemCommand.fromJS({ ...item, listId: this.selectedList.id }))
+            this.itemsClient.create(CreateTransactionCommand.fromJS({ ...item, listId: this.selectedList.id }))
                 .subscribe(
                     result => {
                         item.id = result;
@@ -189,7 +222,7 @@ export class TodoComponent {
                     error => console.error(error)
                 );
         } else {
-            this.itemsClient.update(item.id, UpdateTodoItemCommand.fromJS(item))
+            this.itemsClient.update(item.id, UpdateTransactionCommand.fromJS(item))
                 .subscribe(
                     () => console.log('Update succeeded.'),
                     error => console.error(error)
@@ -202,6 +235,7 @@ export class TodoComponent {
             this.addItem();
         }
     }
+
 
     // Delete item
     deleteItem(item: TodoItemDto) {

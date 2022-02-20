@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.Common.Models;
+﻿using CleanArchitecture.Application.Common.Interfaces;
+using CleanArchitecture.Application.Common.Models;
 using CleanArchitecture.Application.TodoItems.Commands.CreateTodoItem;
 using CleanArchitecture.Application.TodoItems.Commands.DeleteTodoItem;
 using CleanArchitecture.Application.TodoItems.Commands.UpdateTodoItem;
@@ -10,8 +11,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace CleanArchitecture.WebUI.Controllers;
 
 [Authorize]
-public class TodoItemsController : ApiControllerBase
+public class TransactionController : ApiControllerBase
 {
+    private readonly ICurrentUserService _currentUserService;
+
+    public TransactionController(ICurrentUserService currentUserService)
+    {
+        _currentUserService = currentUserService;
+    }
+
     [HttpGet]
     public async Task<ActionResult<PaginatedList<TodoItemBriefDto>>> GetTodoItemsWithPagination([FromQuery] GetTodoItemsWithPaginationQuery query)
     {
@@ -19,19 +27,20 @@ public class TodoItemsController : ApiControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create(CreateTodoItemCommand command)
+    public async Task<ActionResult<int>> Create(CreateTransactionCommand command)
     {
+        command.UserId = _currentUserService.UserId;
         return await Mediator.Send(command);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Update(int id, UpdateTodoItemCommand command)
+    public async Task<ActionResult> Update(int id, UpdateTransactionCommand command)
     {
         if (id != command.Id)
         {
             return BadRequest();
         }
-
+        command.UserId = _currentUserService.UserId;
         await Mediator.Send(command);
 
         return NoContent();

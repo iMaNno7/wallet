@@ -43,6 +43,9 @@
         <h2 class="float-right">{{ selectedList.title }}</h2>
       </div>
       <ul id="todo-items" class="list-group mb-2">
+        <li class="list-group-item btn btn-primary text-center" style="cursor: pointer;" (click)="showItemDetailsModal(itemDetailsModalTemplate, item)">
+           افزودن تراکنش
+        </li>
         <li class="list-group-item" *ngFor="let item of selectedList.items; index as i">
           <div class="d-flex">
             <div class="todo-item-checkbox">
@@ -64,10 +67,7 @@
               </button>
             </div>
           </div>
-        </li>
-        <li class="list-group-item" (click)="addItem()">
-          <button class="btn btn-default">Add Item...</button>
-        </li>
+        </li>        
       </ul>
     </div>
   </div>
@@ -79,14 +79,15 @@
 
 <ng-template #listOptionsModalTemplate>
   <div class="modal-header clearfix">
-    <h4 class="modal-title float-left">List Options</h4>
+    <h4 class="modal-title float-left">ویرایش دسته بندی</h4>
     <button type="button" class="close float-right" aria-label="Close" (click)="listOptionsModalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
+    
     <div class="form-group">
-      <label for="inputListTitle">Title</label>
+      <label for="inputListTitle">عنوان</label>
       <input type="text" class="form-control" id="inputListTitle" placeholder="List name..."
         [(ngModel)]="listOptionsEditor.title" (keyup.enter)="updateListOptions()" />
     </div>
@@ -97,11 +98,11 @@
   <div class="modal-footer">
     <div class="clearfix">
       <div class="float-left">
-        <button class="btn btn-default text-danger" (click)="confirmDeleteList(deleteListModalTemplate)">Delete</button>
+        <button class="btn btn-default text-danger" (click)="confirmDeleteList(deleteListModalTemplate)">حذف</button>
       </div>
       <div class="float-right">
-        <button class="btn btn-default" (click)="listOptionsModalRef.hide()">Cancel</button>
-        <button class="btn btn-primary" (click)="updateListOptions()">Update</button>
+        <button class="btn btn-default" (click)="listOptionsModalRef.hide()">لغو</button>
+        <button class="btn btn-primary" (click)="updateListOptions()">ویرایش</button>
       </div>
     </div>
   </div>
@@ -109,27 +110,42 @@
 
 <ng-template #itemDetailsModalTemplate>
   <div class="modal-header clearfix">
-    <h4 class="modal-title float-left">Item Details</h4>
-    <button type="button" class="close float-right" aria-label="Close" (click)="itemDetailsModalRef.hide()">
+    <h4 class="modal-title float-left">ویرایش یا افزودن تراکنش</h4>
+    <button type="button" class="close float-left" aria-label="Close" (click)="itemDetailsModalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
     <div class="form">
       <div class="form-group">
-        <label for="list">List</label>
+        <label for="note">عنوان</label>
+        <input id="title" class="form-control" [(ngModel)]="itemDetailsEditor.title">
+      </div>
+      <div class="form-group">
+        <label for="note">مقدار</label>
+        <input id="amount" class="form-control" [(ngModel)]="itemDetailsEditor.amount">
+      </div>
+      <div class="form-group" *ngIf="itemDetailsEditor.id">
+        <label for="list">دسته بندی</label>
         <select class="form-control" [(ngModel)]="itemDetailsEditor.listId">
           <option [ngValue]="list.id" *ngFor="let list of vm.lists">{{ list.title }}</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="priority">Priority</label>
+        <label for="priority">نوع تراکنش</label>
+        <select class="form-control" [(ngModel)]="itemDetailsEditor.transactionType">
+          <option [ngValue]="0"> واریز </option>
+          <option [ngValue]="1"> برداشت </option>
+        </select>
+      </div>
+      <!-- <div class="form-group">
+        <label for="priority">اهمیت</label>
         <select class="form-control" [(ngModel)]="itemDetailsEditor.priority">
           <option [ngValue]="level.value" *ngFor="let level of vm.priorityLevels">{{ level.name }}</option>
         </select>
-      </div>
+      </div> -->
       <div class="form-group">
-        <label for="note">Note</label>
+        <label for="note">توضیحات</label>
         <textarea id="note" class="form-control" rows="3" [(ngModel)]="itemDetailsEditor.note"></textarea>
       </div>
     </div>
@@ -140,11 +156,11 @@
   <div class="modal-footer">
     <div class="clearfix">
       <div class="float-left">
-        <button class="btn btn-default text-danger" (click)="deleteItem(selectedItem)">Delete</button>
+        <button class="btn btn-default text-danger" (click)="deleteItem(selectedItem)">حذف</button>
       </div>
       <div class="float-right">
-        <button class="btn btn-default" (click)="itemDetailsModalRef.hide()">Cancel</button>
-        <button class="btn btn-primary" (click)="updateItemDetails()">Update</button>
+        <button class="btn btn-default" (click)="itemDetailsModalRef.hide()">لغو</button>
+        <button class="btn btn-primary" (click)="updateItemDetails()">ثبت</button>
       </div>
     </div>
   </div>
@@ -158,22 +174,22 @@
     </button>
   </div>
   <div class="modal-body">
-    <p>All items will be permanently deleted. </p>
+    <p>تمام آیتم ها به صورت دائمی حذف می شوند</p>
     <div *ngIf="debug">
       <pre>{{ selectedList | json }}</pre>
     </div>
   </div>
   <div class="modal-footer">
     <div class="text-right">
-      <button type="button" class="btn btn-default" (click)="deleteListModalRef.hide()">Cancel</button>
-      <button type="button" class="btn btn-danger" (click)="deleteListConfirmed()">Delete</button>
+      <button type="button" class="btn btn-default" (click)="deleteListModalRef.hide()">لغو</button>
+      <button type="button" class="btn btn-danger" (click)="deleteListConfirmed()">حذف</button>
     </div>
   </div>
 </ng-template>
 
 <ng-template #newListModalTemplate>
   <div class="modal-header clearfix">
-    <h4 class="modal-title float-left">New List</h4>
+    <h4 class="modal-title float-left">دسته بندی جدید</h4>
     <button type="button" class="close float-right" aria-label="Close" (click)="newListCancelled()">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -193,8 +209,8 @@
   </div>
   <div class="modal-footer">
     <div class="text-right">
-      <button class="btn btn-default" (click)="newListCancelled()">Cancel</button>
-      <button class="btn btn-primary" (click)="addList()">Create</button>
+      <button class="btn btn-default" (click)="newListCancelled()">لغو</button>
+      <button class="btn btn-primary" (click)="addList()">ایجاد</button>
     </div>
   </div>
 </ng-template>

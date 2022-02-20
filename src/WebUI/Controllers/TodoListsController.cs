@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.TodoLists.Commands.CreateTodoList;
+﻿using CleanArchitecture.Application.Common.Interfaces;
+using CleanArchitecture.Application.TodoLists.Commands.CreateTodoList;
 using CleanArchitecture.Application.TodoLists.Commands.DeleteTodoList;
 using CleanArchitecture.Application.TodoLists.Commands.UpdateTodoList;
 using CleanArchitecture.Application.TodoLists.Queries.ExportTodos;
@@ -11,10 +12,17 @@ namespace CleanArchitecture.WebUI.Controllers;
 [Authorize]
 public class TodoListsController : ApiControllerBase
 {
+    private readonly ICurrentUserService _currentUserService;
+
+    public TodoListsController(ICurrentUserService currentUserService)
+    {
+        _currentUserService = currentUserService;
+    }
+
     [HttpGet]
     public async Task<ActionResult<TodosVm>> Get()
     {
-        return await Mediator.Send(new GetTodosQuery());
+        return await Mediator.Send(new GetTodosQuery() { UserId=_currentUserService.UserId});
     }
 
     [HttpGet("{id}")]

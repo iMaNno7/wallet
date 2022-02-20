@@ -10,3 +10,4 @@ public class GetAllWalletVm:IMapFrom<Domain.Entities.WalletAggregate.Wallet> {
     public bool IscActive { get; set; }
 
 }
+

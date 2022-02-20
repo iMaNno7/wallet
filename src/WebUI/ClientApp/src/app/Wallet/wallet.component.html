@@ -16,6 +16,17 @@
       </div>
     </div>
     <div class="col-sm-8" *ngIf="selectedList">
+      <div class="clearfix">
+        <!-- <div class="float-left">
+          جزئیات
+        </div>
+        <div class="float-left px-2">
+          موجودی
+        </div>
+        
+        <span class="float-right">وضعیت</span>
+        <span class="float-right px-2">عنوان</span> -->
+      </div>
       <ul id="todo-items" class="list-group mb-2">
         <li class="list-group-item" *ngFor="let item of selectedList; index as i">
           <div class="d-flex">

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Application.TodoItems.EventHandlers;
 
-public class TodoItemCreatedEventHandler : INotificationHandler<DomainEventNotification<TodoItemCreatedEvent>>
+public class TodoItemCreatedEventHandler : INotificationHandler<DomainEventNotification<TransactionCreatedEvent>>
 {
     private readonly ILogger<TodoItemCreatedEventHandler> _logger;
 
@@ -14,7 +14,7 @@ public class TodoItemCreatedEventHandler : INotificationHandler<DomainEventNotif
         _logger = logger;
     }
 
-    public Task Handle(DomainEventNotification<TodoItemCreatedEvent> notification, CancellationToken cancellationToken)
+    public Task Handle(DomainEventNotification<TransactionCreatedEvent> notification, CancellationToken cancellationToken)
     {
         var domainEvent = notification.DomainEvent;
 

@@ -92,17 +92,17 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("WalletId")
+                    b.Property<int>("TransactionType")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("WalletId1")
+                    b.Property<Guid>("WalletId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("WalletId1");
+                    b.HasIndex("WalletId");
 
                     b.ToTable("Transaction");
                 });
@@ -515,7 +515,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasOne("CleanArchitecture.Domain.Entities.WalletAggregate.Wallet", "Wallet")
                         .WithMany("Transactions")
-                        .HasForeignKey("WalletId1")
+                        .HasForeignKey("WalletId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

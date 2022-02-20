@@ -5,6 +5,7 @@ namespace CleanArchitecture.Domain.Entities;
 public class Transaction : AuditableEntity, IHasDomainEvent
 {
     public int CategoryId { get; set; }
+    public TransactionType TransactionType { get; set; }
 
     public Amount Amount { get; set; }
 
@@ -12,7 +13,7 @@ public class Transaction : AuditableEntity, IHasDomainEvent
 
     public string? Note { get; set; }
 
-    public int WalletId { get; set; }
+    public Guid WalletId { get; set; }
     public PriorityLevel Priority { get; set; }
 
     public DateTime? Reminder { get; set; }
