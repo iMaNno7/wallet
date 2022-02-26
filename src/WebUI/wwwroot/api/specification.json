@@ -12,6 +12,37 @@
           "TodoLists"
         ],
         "operationId": "TodoLists_Get",
+        "parameters": [
+          {
+            "name": "UserId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "CreateDateTime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "EndDateTime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -708,7 +739,27 @@
             "type": "string",
             "nullable": true
           },
-          "colour": {
+          "createDateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "createdBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastModified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastModifiedBy": {
             "type": "string",
             "nullable": true
           },
@@ -755,6 +806,17 @@
             "nullable": true
           },
           "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "created": {
+            "type": "string"
+          },
+          "datetime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
             "type": "string",
             "nullable": true
           }
@@ -954,6 +1016,14 @@
           },
           "balance": {
             "$ref": "#/components/schemas/Balance"
+          },
+          "withdrawal": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "deposit": {
+            "type": "number",
+            "format": "decimal"
           },
           "title": {
             "type": "string"

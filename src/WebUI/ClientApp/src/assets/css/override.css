@@ -6,3 +6,6 @@
     padding: 0 !important;
     text-align: right;
   }
+  .form-group{
+      text-align: right !important;
+  }

@@ -20,9 +20,10 @@ public class TodoListsController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<TodosVm>> Get()
+    public async Task<ActionResult<TodosVm>> Get([FromQuery]GetTodosQuery dto)
     {
-        return await Mediator.Send(new GetTodosQuery() { UserId=_currentUserService.UserId});
+        dto.UserId = _currentUserService.UserId;
+        return await Mediator.Send(dto);
     }
 
     [HttpGet("{id}")]

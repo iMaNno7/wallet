@@ -14,13 +14,12 @@ public class CreateTodoListCommandValidator : AbstractValidator<CreateTodoListCo
 
         RuleFor(v => v.Title)
             .NotEmpty().WithMessage("Title is required.")
-            .MaximumLength(200).WithMessage("Title must not exceed 200 characters.")
-            .MustAsync(BeUniqueTitle).WithMessage("The specified title already exists.");
+            .MaximumLength(200).WithMessage("Title must not exceed 200 characters.");
     }
 
-    public async Task<bool> BeUniqueTitle(string title, CancellationToken cancellationToken)
-    {
-        return await _context.Category
-            .AllAsync(l => l.Title != title, cancellationToken);
-    }
+    //public async Task<bool> BeUniqueTitle(string title, CancellationToken cancellationToken)
+    //{
+    //    //return await _context.Category
+    //    //    .AllAsync(l => l.Title != title, cancellationToken);
+    //}
 }

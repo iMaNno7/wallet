@@ -73,9 +73,11 @@ public class Wallet : AuditableEntity<Guid>, IHasDomainEvent
         if (transactionType == TransactionType.Withdrawal)
         {
             Withdrawal(amount);
+            Withdrawal(amount);
         }
         else if (transactionType == TransactionType.Deposit)
         {
+            Charge(amount);
             Charge(amount);
         }
     }

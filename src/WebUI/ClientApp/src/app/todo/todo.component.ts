@@ -10,7 +10,10 @@ import {
 } from '../web-api-client';
 import { faPlus, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-
+import Swal from 'sweetalert2';
+import { DatepickerOptions } from 'ng2-datepicker';
+import { getYear } from 'date-fns';
+import locale from 'date-fns/locale/fa-IR';
 @Component({
     selector: 'app-todo-component',
     templateUrl: './todo.component.html',
@@ -19,7 +22,8 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 export class TodoComponent {
 
     debug = false;
-
+    startDate : Date;
+    endDate : Date;
     vm: TodosVm;
     transactionType: TransactionType;
 
@@ -37,14 +41,40 @@ export class TodoComponent {
 
     faPlus = faPlus;
     faEllipsisH = faEllipsisH;
-
+    total = 0;
+    dgree = 0;
+    agree = 0;
     constructor(private listsClient: TodoListsClient, private itemsClient: TransactionClient, private modalService: BsModalService) {
-        listsClient.get().subscribe(
+        this.getList();
+    }
+    options: DatepickerOptions = {
+        locale: locale, // date-fns locale
+      };
+    getList() {
+        this.listsClient.get(null,this.startDate,this.endDate).subscribe(
             result => {
                 this.vm = result;
                 if (this.vm.lists.length) {
                     this.selectedList = this.vm.lists[0];
                 }
+                debugger
+                if (this.vm.lists.length <= 0){
+                    this.selectedList.items=[];
+                }
+                debugger
+                this.total = this.vm.lists.reduce((sum, curent) => sum + curent.total, 0);
+                this.agree = this.vm.lists
+                    .reduce((sum, curent) => sum +
+                        curent.items
+                            .filter(x => x.transactionType == TransactionType.Deposit)
+                            .reduce((s, i) => s + i.amount, 0)
+                        , 0);
+                this.dgree = this.vm.lists
+                    .reduce((sum, curent) => sum +
+                        curent.items
+                            .filter(x => x.transactionType == TransactionType.Withdrawal)
+                            .reduce((s, i) => s + i.amount, 0)
+                        , 0);
             },
             error => console.error(error)
         );
@@ -108,6 +138,7 @@ export class TodoComponent {
                     this.selectedList.title = this.listOptionsEditor.title,
                         this.listOptionsModalRef.hide();
                     this.listOptionsEditor = {};
+
                 },
                 error => console.error(error)
             );
@@ -124,6 +155,7 @@ export class TodoComponent {
                 this.deleteListModalRef.hide();
                 this.vm.lists = this.vm.lists.filter(t => t.id != this.selectedList.id)
                 this.selectedList = this.vm.lists.length ? this.vm.lists[0] : null;
+                this.getList();
             },
             error => console.error(error)
         );
@@ -144,7 +176,7 @@ export class TodoComponent {
     updateItemDetails(): void {
         let newItem = this.selectedItem?.id == undefined;
         if (newItem) {
-            this.itemsClient.create(CreateTransactionCommand.fromJS({ ...this.itemDetailsEditor, listId: this.selectedList.id }))
+            this.itemsClient.create(CreateTransactionCommand.fromJS({ ...this.itemDetailsEditor }))
                 .subscribe(
                     result => {
                         debugger
@@ -154,15 +186,23 @@ export class TodoComponent {
                             priority: this.vm.priorityLevels[0].value,
                             title: this.itemDetailsEditor.title,
                             done: false,
-                            note:this.itemDetailsEditor.note,
-                            amount:this.itemDetailsEditor.amount,
-                            transactionType:this.itemDetailsEditor.transactionType,                            
-                        });                
+                            note: this.itemDetailsEditor.note,
+                            amount: this.itemDetailsEditor.amount,
+                            transactionType: this.itemDetailsEditor.transactionType,
+                        });
                         this.selectedList.items.push(item);
                         this.itemDetailsModalRef.hide();
                         this.itemDetailsEditor = {};
+                        this.getList();
                     },
-                    error => console.error(error)
+                    error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطا',
+                            text: 'موجودی کیف پول منفی می باشد'
+                        })
+
+                    }
                 );
         }
         else {
@@ -180,6 +220,7 @@ export class TodoComponent {
                         this.selectedItem.note = this.itemDetailsEditor.note;
                         this.itemDetailsModalRef.hide();
                         this.itemDetailsEditor = {};
+                        this.getList();
                     },
                     error => console.error(error)
                 );
@@ -248,9 +289,14 @@ export class TodoComponent {
             this.selectedList.items.splice(itemIndex, 1);
         } else {
             this.itemsClient.delete(item.id).subscribe(
-                () => this.selectedList.items = this.selectedList.items.filter(t => t.id != item.id),
-                error => console.error(error)
-            );
-        }
+                () =>this.getList(),
+                error =>   Swal.fire({
+                    icon: 'error',
+                    title: 'خطا',
+                    text: 'موجودی کیف پول منفی می باشد'
+                })
+                );
+            }
+            this.getList();
     }
 }

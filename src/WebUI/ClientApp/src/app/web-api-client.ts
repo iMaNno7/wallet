@@ -15,7 +15,7 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface ITodoListsClient {
-    get(): Observable<TodosVm>;
+    get(userId: string | null | undefined, createDateTime: Date | null | undefined, endDateTime: Date | null | undefined): Observable<TodosVm>;
     create(command: CreateTodoListCommand): Observable<number>;
     get2(id: number): Observable<FileResponse>;
     update(id: number, command: UpdateTodoListCommand): Observable<FileResponse>;
@@ -35,8 +35,14 @@ export class TodoListsClient implements ITodoListsClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    get() : Observable<TodosVm> {
-        let url_ = this.baseUrl + "/api/TodoLists";
+    get(userId: string | null | undefined, createDateTime: Date | null | undefined, endDateTime: Date | null | undefined) : Observable<TodosVm> {
+        let url_ = this.baseUrl + "/api/TodoLists?";
+        if (userId !== undefined && userId !== null)
+            url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+        if (createDateTime !== undefined && createDateTime !== null)
+            url_ += "CreateDateTime=" + encodeURIComponent(createDateTime ? "" + createDateTime.toISOString() : "") + "&";
+        if (endDateTime !== undefined && endDateTime !== null)
+            url_ += "EndDateTime=" + encodeURIComponent(endDateTime ? "" + endDateTime.toISOString() : "") + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1083,7 +1089,12 @@ export interface IPriorityLevelDto {
 export class TodoListDto implements ITodoListDto {
     id?: number;
     title?: string | undefined;
-    colour?: string | undefined;
+    createDateTime?: Date;
+    created?: string;
+    total?: number;
+    createdBy?: string | undefined;
+    lastModified?: Date | undefined;
+    lastModifiedBy?: string | undefined;
     items?: TodoItemDto[];
 
     constructor(data?: ITodoListDto) {
@@ -1099,7 +1110,12 @@ export class TodoListDto implements ITodoListDto {
         if (_data) {
             this.id = _data["id"];
             this.title = _data["title"];
-            this.colour = _data["colour"];
+            this.createDateTime = _data["createDateTime"] ? new Date(_data["createDateTime"].toString()) : <any>undefined;
+            this.created = _data["created"];
+            this.total = _data["total"];
+            this.createdBy = _data["createdBy"];
+            this.lastModified = _data["lastModified"] ? new Date(_data["lastModified"].toString()) : <any>undefined;
+            this.lastModifiedBy = _data["lastModifiedBy"];
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
                 for (let item of _data["items"])
@@ -1119,7 +1135,12 @@ export class TodoListDto implements ITodoListDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["title"] = this.title;
-        data["colour"] = this.colour;
+        data["createDateTime"] = this.createDateTime ? this.createDateTime.toISOString() : <any>undefined;
+        data["created"] = this.created;
+        data["total"] = this.total;
+        data["createdBy"] = this.createdBy;
+        data["lastModified"] = this.lastModified ? this.lastModified.toISOString() : <any>undefined;
+        data["lastModifiedBy"] = this.lastModifiedBy;
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -1132,7 +1153,12 @@ export class TodoListDto implements ITodoListDto {
 export interface ITodoListDto {
     id?: number;
     title?: string | undefined;
-    colour?: string | undefined;
+    createDateTime?: Date;
+    created?: string;
+    total?: number;
+    createdBy?: string | undefined;
+    lastModified?: Date | undefined;
+    lastModifiedBy?: string | undefined;
     items?: TodoItemDto[];
 }
 
@@ -1146,6 +1172,9 @@ export class TodoItemDto implements ITodoItemDto {
     amount?: number;
     title?: string | undefined;
     note?: string | undefined;
+    created?: string;
+    datetime?: Date;
+    createdBy?: string | undefined;
 
     constructor(data?: ITodoItemDto) {
         if (data) {
@@ -1167,6 +1196,9 @@ export class TodoItemDto implements ITodoItemDto {
             this.amount = _data["amount"];
             this.title = _data["title"];
             this.note = _data["note"];
+            this.created = _data["created"];
+            this.datetime = _data["datetime"] ? new Date(_data["datetime"].toString()) : <any>undefined;
+            this.createdBy = _data["createdBy"];
         }
     }
 
@@ -1188,6 +1220,9 @@ export class TodoItemDto implements ITodoItemDto {
         data["amount"] = this.amount;
         data["title"] = this.title;
         data["note"] = this.note;
+        data["created"] = this.created;
+        data["datetime"] = this.datetime ? this.datetime.toISOString() : <any>undefined;
+        data["createdBy"] = this.createdBy;
         return data; 
     }
 }
@@ -1202,6 +1237,9 @@ export interface ITodoItemDto {
     amount?: number;
     title?: string | undefined;
     note?: string | undefined;
+    created?: string;
+    datetime?: Date;
+    createdBy?: string | undefined;
 }
 
 export enum TransactionType {
@@ -1571,6 +1609,8 @@ export enum PriorityLevel {
 export class GetAllWalletVm implements IGetAllWalletVm {
     id?: string;
     balance?: Balance;
+    withdrawal?: number;
+    deposit?: number;
     title?: string;
     iscActive?: boolean;
 
@@ -1587,6 +1627,8 @@ export class GetAllWalletVm implements IGetAllWalletVm {
         if (_data) {
             this.id = _data["id"];
             this.balance = _data["balance"] ? Balance.fromJS(_data["balance"]) : <any>undefined;
+            this.withdrawal = _data["withdrawal"];
+            this.deposit = _data["deposit"];
             this.title = _data["title"];
             this.iscActive = _data["iscActive"];
         }
@@ -1603,6 +1645,8 @@ export class GetAllWalletVm implements IGetAllWalletVm {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["balance"] = this.balance ? this.balance.toJSON() : <any>undefined;
+        data["withdrawal"] = this.withdrawal;
+        data["deposit"] = this.deposit;
         data["title"] = this.title;
         data["iscActive"] = this.iscActive;
         return data; 
@@ -1612,6 +1656,8 @@ export class GetAllWalletVm implements IGetAllWalletVm {
 export interface IGetAllWalletVm {
     id?: string;
     balance?: Balance;
+    withdrawal?: number;
+    deposit?: number;
     title?: string;
     iscActive?: boolean;
 }

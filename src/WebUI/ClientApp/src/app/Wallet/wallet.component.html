@@ -150,9 +150,9 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" dir="rtl">
     <div class="form-group">
-      <label for="title">Title</label>
+      <label for="title">عنوان</label>
       <input type="text" class="form-control" id="title" placeholder="عنوان کیف پول" [(ngModel)]="model.title"
         [ngClass]="{ 'is-invalid': newListEditor.error }" (keyup.enter)="addList()" />
       <div *ngIf="newListEditor.error" class="invalid-feedback">
@@ -165,8 +165,8 @@
   </div>
   <div class="modal-footer">
     <div class="text-right">
-      <button class="btn btn-default" (click)="newListCancelled()">Cancel</button>
-      <button class="btn btn-primary" (click)="createWallet()">Create</button>
+      <button class="btn btn-default" (click)="newListCancelled()">لغو</button>
+      <button class="btn btn-primary" (click)="createWallet()">ایجاد</button>
     </div>
   </div>
 </ng-template>

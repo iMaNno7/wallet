@@ -1,21 +1,32 @@
-<div style="text-align: right;">
-  <h1>لیست گزارشات</h1>
-
-  <p>درآمد ها و هزینه های هر دسته بندی </p>  
+<div class="row">
+  <div class="col-4" style="text-align: right;">
+    <h1>لیست گزارشات</h1>
+    <p>درآمد ها و هزینه های هر دسته بندی </p>
+  </div>
+  <div class="form-group col-3 m-auto">
+    <label for="title">  تاریخ شروع : </label>
+    <ngx-datepicker [(ngModel)]="startDate" [options]="options"></ngx-datepicker>
+  </div>
+  <div class="form-group col-3 m-auto">
+    <label for="title"> تاریخ پایان : </label>
+    <ngx-datepicker [(ngModel)]="endDate" [options]="options"></ngx-datepicker>
+  </div>
+  <div class="form-group col-2 m-auto">
+    <button class="btn btn-primary" (click)="getList()"> جستجو </button>
+  </div>
 </div>
 <p *ngIf="!vm" style="text-align: center;"><em>
-  <img src="assets/images/loading-opaque.gif" width="250" alt="بارگذاری">
-  <br/>
-  <span>
-    در حال بارگذاری
-  </span>
-</em></p>
+    <img src="assets/images/loading-opaque.gif" width="250" alt="بارگذاری">
+    <br />
+    <span>
+      در حال بارگذاری
+    </span>
+  </em></p>
 <div *ngIf="vm">
   <div class="row">
     <div class="col-sm-4">
       <div class="clearfix">
-        <button class="btn btn-default float-left" title="Add List..."
-          (click)="showNewListModal(newListModalTemplate)">
+        <button class="btn btn-default float-left" title="Add List..." (click)="showNewListModal(newListModalTemplate)">
           <fa-icon [icon]="faPlus"></fa-icon>
         </button>
         <h2 class="float-right">دسته بندی ها</h2>
@@ -26,11 +37,28 @@
           <div class="clearfix">
             <div class="float-right">
               {{ list.title }}
+              <span *ngIf="list.total>0" style="color: #00ff3a!important">
+                ({{ list.total }} تومان)
+              </span>
+              <span *ngIf="list.total<0" style="color: #ee1b1b!important">
+                ({{ list.total }} تومان)
+              </span>
             </div>
             <div class="float-left text-right">
               <span class="badge badge-light">{{ remainingItems(list) }}</span>
             </div>
           </div>
+        </li>
+        <li class="list-group-item">
+          <span class="list-group-item" *ngIf="total>0" style="color: #00ff3a!important">
+            واریزها : {{agree}}
+          </span>
+          <span class="list-group-item" *ngIf="total>0" style="color: #ee1b1b!important">
+            برداشت ها : {{dgree}}
+          </span>
+          <span class="list-group-item" *ngIf="total>0">
+            موجودی : {{total}}
+          </span>
         </li>
       </ul>
     </div>
@@ -43,8 +71,9 @@
         <h2 class="float-right">{{ selectedList.title }}</h2>
       </div>
       <ul id="todo-items" class="list-group mb-2">
-        <li class="list-group-item btn btn-primary text-center" style="cursor: pointer;" (click)="showItemDetailsModal(itemDetailsModalTemplate, item)">
-           افزودن تراکنش
+        <li class="list-group-item btn btn-primary text-center" style="cursor: pointer;"
+          (click)="showItemDetailsModal(itemDetailsModalTemplate, item)">
+          افزودن تراکنش
         </li>
         <li class="list-group-item" *ngFor="let item of selectedList.items; index as i">
           <div class="d-flex">
@@ -60,6 +89,22 @@
                 <span>{{ item.title }}</span>
               </div>
             </div>
+            <div class="flex-fill">
+              <div class="form-control todo-item-title item-input-control" dir="ltr">
+                <span> {{item.amount}} تومان </span>
+              </div>
+            </div>
+            <div class="flex-fill">
+              <div class="form-control todo-item-title item-input-control" dir="ltr">
+                <span *ngIf="item.transactionType == 0"> واریز </span>
+                <span *ngIf="item.transactionType == 1"> برداشت</span>
+              </div>
+            </div>
+            <div class="flex-fill">
+              <div class="form-control todo-item-title item-input-control" dir="ltr">
+                <span>{{ item.created }}</span>
+              </div>
+            </div>
             <div class="todo-item-commands">
               <button *ngIf="item.id != 0" (click)="showItemDetailsModal(itemDetailsModalTemplate, item)"
                 class="btn btn-default btn-xs" role="button">
@@ -67,7 +112,7 @@
               </button>
             </div>
           </div>
-        </li>        
+        </li>
       </ul>
     </div>
   </div>
@@ -84,11 +129,11 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
-    
+  <div class="modal-body" dir="rtl">
+
     <div class="form-group">
       <label for="inputListTitle">عنوان</label>
-      <input type="text" class="form-control" id="inputListTitle" placeholder="List name..."
+      <input type="text" class="form-control" id="inputListTitle" placeholder="شخصی ، حقوقی و ..."
         [(ngModel)]="listOptionsEditor.title" (keyup.enter)="updateListOptions()" />
     </div>
     <div *ngIf="debug">
@@ -115,7 +160,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" dir="rtl">
     <div class="form">
       <div class="form-group">
         <label for="note">عنوان</label>
@@ -125,7 +170,11 @@
         <label for="note">مقدار</label>
         <input id="amount" class="form-control" [(ngModel)]="itemDetailsEditor.amount">
       </div>
-      <div class="form-group" *ngIf="itemDetailsEditor.id">
+      <div class="form-group">
+        <button class="btn btn-default float-left" title="افزودن دسته بندی..."
+          (click)="showNewListModal(newListModalTemplate)">
+          <fa-icon [icon]="faPlus"></fa-icon>
+        </button>
         <label for="list">دسته بندی</label>
         <select class="form-control" [(ngModel)]="itemDetailsEditor.listId">
           <option [ngValue]="list.id" *ngFor="let list of vm.lists">{{ list.title }}</option>
@@ -168,12 +217,12 @@
 
 <ng-template #deleteListModalTemplate>
   <div class="modal-header clearfix">
-    <h4 class="modal-title float-left">Delete "{{ selectedList?.title }}"?</h4>
+    <h4 class="modal-title float-left">حذف "{{ selectedList?.title }}"?</h4>
     <button type="button" class="close float-right" aria-label="Close" (click)="deleteListModalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" dir="rtl">
     <p>تمام آیتم ها به صورت دائمی حذف می شوند</p>
     <div *ngIf="debug">
       <pre>{{ selectedList | json }}</pre>
@@ -194,11 +243,11 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" dir="rtl">
     <div class="form-group">
-      <label for="title">Title</label>
-      <input type="text" class="form-control" id="title" placeholder="List title..." [(ngModel)]="newListEditor.title"
-        [ngClass]="{ 'is-invalid': newListEditor.error }" (keyup.enter)="addList()" />
+      <label for="title">عنوان</label>
+      <input type="text" class="form-control" id="title" placeholder="عنوان دسته بندی "
+        [(ngModel)]="newListEditor.title" [ngClass]="{ 'is-invalid': newListEditor.error }" (keyup.enter)="addList()" />
       <div *ngIf="newListEditor.error" class="invalid-feedback">
         {{ newListEditor.error }}
       </div>

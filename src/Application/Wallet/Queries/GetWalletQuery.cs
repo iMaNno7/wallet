@@ -26,12 +26,18 @@ public class GetWalletQueryHandler : IRequestHandler<GetWalletQuery, GetAllWalle
         _mapper = mapper;
     }
 
-    public  Task<GetAllWalletVm> Handle(GetWalletQuery request, CancellationToken cancellationToken)
+    public async Task<GetAllWalletVm> Handle(GetWalletQuery request, CancellationToken cancellationToken)
     {
-        return _context.Wallet.
+        var query = await _context.Wallet.
              AsNoTracking()
             .Where(a => a.IdentityUser == request.UserId && a.IscActive)
             .ProjectTo<GetAllWalletVm>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(cancellationToken);
-    }
+
+        query.Withdrawal = await _context.Transaction.Where(x => x.WalletId == query.Id &&
+          x.TransactionType == Domain.Enums.TransactionType.Withdrawal).SumAsync(x => x.Amount.Value);
+        query.Deposit = await _context.Transaction.Where(x => x.WalletId == query.Id &&
+           x.TransactionType == Domain.Enums.TransactionType.Deposit).SumAsync(x => x.Amount.Value);
+        return query;
+        }
 }

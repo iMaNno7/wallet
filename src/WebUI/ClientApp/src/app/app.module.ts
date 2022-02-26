@@ -17,6 +17,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { AppRoutingModule } from './app-routing.module';
 import { TokenComponent } from './token/token.component';
 import { WalletComponent } from './Wallet/wallet.component';
+import { DatepickerModule } from 'ng2-datepicker';
 
 @NgModule({
   declarations: [
@@ -31,8 +32,9 @@ import { WalletComponent } from './Wallet/wallet.component';
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
-    FontAwesomeModule,
+    FontAwesomeModule,    
     HttpClientModule,
+    DatepickerModule,
     FormsModule,
     ApiAuthorizationModule,
     AppRoutingModule,
